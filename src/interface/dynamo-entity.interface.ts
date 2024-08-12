@@ -21,12 +21,6 @@ export type KeyParam<T extends Record<string, string>> = {
   [Key in keyof T]: FormatObject<T[Key]>
 }
 
-export type DynamoColumns = string | number | boolean
-export type DynamoArrayColumns = DynamoColumns[]
-export type DynamoItem = {
-  [Key in string]: DynamoColumns | DynamoArrayColumns | Record<string, DynamoColumns | DynamoArrayColumns | DynamoItem>
-}
-
 export type ParseKey<T extends Record<string, string>> = {
   [Key in keyof T]: DynamoKey<T[Key]>
 };
@@ -35,3 +29,26 @@ export type EntityType<T extends DynamoEntity<any, any>> =
   T extends DynamoEntity<infer TKey, infer TProp>
     ? ParseKey<TKey> & TProp
     : never
+
+
+type DynamoDBScalarType = string | number | boolean | null;
+type DynamoDBBinaryType = Buffer | Uint8Array;
+
+type DynamoDBSetType = Set<string | number | DynamoDBBinaryType>;
+
+type DynamoDBListType = DynamoDBAttributeValue[];
+
+interface DynamoDBMapType {
+  [key: string]: DynamoDBAttributeValue;
+}
+
+type DynamoDBAttributeValue =
+  | DynamoDBScalarType
+  | DynamoDBBinaryType
+  | DynamoDBSetType
+  | DynamoDBListType
+  | DynamoDBMapType;
+
+export type DynamoItem = {
+  [key: string]: DynamoDBAttributeValue;
+}
